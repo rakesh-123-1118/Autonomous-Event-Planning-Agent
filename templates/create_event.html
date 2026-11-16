@@ -1,0 +1,115 @@
+{% extends 'base.html' %}
+
+{% block title %}Create Event{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="page-header mb-4">
+        <h2>Create New Event</h2>
+        <p class="text-muted">Describe the event in natural language and let the planner generate tasks.</p>
+    </div>
+
+    <form id="event-form" class="card custom-card p-4">
+        <div class="row g-3">
+            <div class="col-md-6">
+                <label class="form-label">Event Name</label>
+                <input type="text" class="form-control" name="event_name" required>
+            </div>
+            <div class="col-md-6">
+                <label class="form-label">Event Type</label>
+                <select class="form-select" name="event_type">
+                    <option>Technical Workshop</option>
+                    <option>Hackathon</option>
+                    <option>Seminar</option>
+                    <option>Conference</option>
+                    <option>College Fest</option>
+                    <option>Cultural Event</option>
+                    <option>Sports Event</option>
+                    <option>Webinar</option>
+                    <option>Custom Event</option>
+                </select>
+            </div>
+            <div class="col-12">
+                <label class="form-label">Description / Natural-language requirement</label>
+                <textarea class="form-control" name="description" rows="4" required></textarea>
+            </div>
+            <div class="col-md-4">
+                <label class="form-label">Event Date</label>
+                <input type="date" class="form-control" name="event_date">
+            </div>
+            <div class="col-md-4">
+                <label class="form-label">Location</label>
+                <input type="text" class="form-control" name="location">
+            </div>
+            <div class="col-md-4">
+                <label class="form-label">Duration</label>
+                <input type="text" class="form-control" name="duration" placeholder="e.g. 1 day">
+            </div>
+            <div class="col-md-4">
+                <label class="form-label">Participants</label>
+                <input type="number" class="form-control" name="participants" min="1" value="50">
+            </div>
+            <div class="col-md-4">
+                <label class="form-label">Budget</label>
+                <input type="number" class="form-control" name="budget" min="0" value="25000">
+            </div>
+            <div class="col-md-4">
+                <label class="form-label">Additional Requirements</label>
+                <input type="text" class="form-control" name="additional_requirements" placeholder="Optional">
+            </div>
+        </div>
+        <div id="form-error" class="alert alert-danger mt-3 d-none" role="alert"></div>
+        <div class="mt-4 d-flex justify-content-between">
+            <button id="generate-plan-button" type="submit" class="btn btn-primary btn-lg">Generate Plan</button>
+        </div>
+    </form>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+const form = document.getElementById('event-form');
+const submitButton = document.getElementById('generate-plan-button');
+const errorBox = document.getElementById('form-error');
+
+form.addEventListener('submit', async function (e) {
+    e.preventDefault();
+    const payload = Object.fromEntries(new FormData(form).entries());
+    errorBox.classList.add('d-none');
+    errorBox.textContent = '';
+    submitButton.disabled = true;
+    submitButton.textContent = 'Creating event...';
+
+    try {
+        const createResponse = await fetch('/api/events', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+        });
+
+        const createdEvent = await createResponse.json();
+        if (!createResponse.ok) {
+            throw new Error(createdEvent.error || 'Could not create event.');
+        }
+
+        submitButton.textContent = 'Generating plan...';
+        const planResponse = await fetch(`/api/events/${createdEvent.id}/generate-plan`, {
+            method: 'POST'
+        });
+
+        const planResult = await planResponse.json();
+        if (!planResponse.ok) {
+            throw new Error(planResult.error || 'Event created, but the plan could not be generated.');
+        }
+
+        window.location.href = `/planning?event_id=${createdEvent.id}`;
+    } catch (error) {
+        errorBox.textContent = error.message || 'A network error prevented event creation.';
+        errorBox.classList.remove('d-none');
+    } finally {
+        submitButton.disabled = false;
+        submitButton.textContent = 'Generate Plan';
+    }
+});
+</script>
+{% endblock %}

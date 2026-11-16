@@ -1,0 +1,37 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="260" viewBox="0 0 900 260" role="img" aria-labelledby="title">
+  <title id="title">ROCKY event planning</title>
+  <defs>
+    <linearGradient id="gold" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#fff0b0"/>
+      <stop offset=".35" stop-color="#f0c44f"/>
+      <stop offset=".7" stop-color="#b98121"/>
+      <stop offset="1" stop-color="#ffe7a0"/>
+    </linearGradient>
+    <linearGradient id="tent" x1="0" y1="0" x2="0" y2="1">
+      <stop stop-color="#ffe69a"/>
+      <stop offset="1" stop-color="#b77c1d"/>
+    </linearGradient>
+  </defs>
+  <rect x="3" y="3" width="894" height="254" rx="22" fill="#080808" stroke="#483815" stroke-width="3"/>
+  <rect x="24" y="24" width="208" height="212" rx="18" fill="#101010" stroke="url(#gold)" stroke-width="4"/>
+  <g stroke="url(#gold)" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M66 74h116v118H66z" fill="#15120b" stroke-width="7"/>
+    <path d="M92 59v29M156 59v29" stroke-width="11"/>
+    <path d="M67 103h114" stroke-width="6"/>
+    <path d="m94 148 19 18 42-46" stroke-width="11"/>
+    <path d="M52 202h145" stroke-width="6"/>
+  </g>
+  <g fill="url(#gold)">
+    <circle cx="92" cy="215" r="10"/>
+    <circle cx="124" cy="210" r="13"/>
+    <circle cx="158" cy="215" r="10"/>
+  </g>
+  <g transform="translate(251 34)">
+    <path d="M24 111 92 37l68 74z" fill="url(#tent)"/>
+    <path d="M92 37v74M24 111h136" fill="none" stroke="#f8dfa0" stroke-width="5" stroke-linejoin="round"/>
+    <path d="M92 24v24m0-24 19 7-19 7" fill="url(#gold)" stroke="url(#gold)" stroke-width="4" stroke-linejoin="round"/>
+    <path d="M42 111V92m32 19V73m36 38V73m32 38V92" stroke="#171109" stroke-width="4"/>
+  </g>
+  <path d="M244 194c92-35 155-43 223-23" fill="none" stroke="url(#gold)" stroke-width="4" stroke-linecap="round"/>
+  <text x="400" y="167" fill="url(#gold)" font-family="Georgia, 'Times New Roman', serif" font-size="133" font-weight="700" letter-spacing="-6">ROCKY</text>
+</svg>

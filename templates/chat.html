@@ -1,0 +1,61 @@
+{% extends 'base.html' %}
+
+{% block title %}AI Chat{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="page-header mb-4">
+        <h2>AI Event Assistant</h2>
+        <p class="text-muted">Ask about pending tasks, recommendations, or next actions.</p>
+    </div>
+
+    <div class="card custom-card p-4">
+        <div id="chat-box" class="chat-box">
+            <div class="message bot">Hello! Ask me about the event plan.</div>
+        </div>
+
+        <div class="input-group mt-3">
+            <input id="chat-input" type="text" class="form-control" placeholder="Ask: What tasks are remaining?">
+            <button id="send-chat" class="btn btn-primary">Send</button>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+async function sendChatMessage() {
+    const input = document.getElementById('chat-input');
+    const message = input.value.trim();
+    if (!message) return;
+
+    const chatBox = document.getElementById('chat-box');
+    chatBox.innerHTML += `<div class="message user">${message}</div>`;
+    input.value = '';
+
+    const eventsResponse = await fetch('/api/events');
+    const events = await eventsResponse.json();
+    if (!events.length) {
+        chatBox.innerHTML += `<div class="message bot">Create an event first to enable smart assistance.</div>`;
+        return;
+    }
+
+    const response = await fetch(`/api/chat/${events[0].id}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ message })
+    });
+
+    const result = await response.json();
+    chatBox.innerHTML += `<div class="message bot">${result.answer}</div>`;
+    chatBox.scrollTop = chatBox.scrollHeight;
+}
+
+document.getElementById('send-chat').addEventListener('click', sendChatMessage);
+document.getElementById('chat-input').addEventListener('keydown', function (event) {
+    if (event.key === 'Enter') {
+        sendChatMessage();
+    }
+});
+</script>
+{% endblock %}

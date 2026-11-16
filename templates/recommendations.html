@@ -1,0 +1,44 @@
+{% extends 'base.html' %}
+
+{% block title %}AI Recommendations{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="page-header mb-4">
+        <h2>AI Recommendations</h2>
+        <p class="text-muted">Actionable suggestions based on current task states and deadlines.</p>
+    </div>
+
+    <div id="recommendations-container" class="card custom-card p-4">
+        Loading recommendations...
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+async function loadRecommendations() {
+    const eventsResponse = await fetch('/api/events');
+    const events = await eventsResponse.json();
+    if (!events.length) {
+        document.getElementById('recommendations-container').innerHTML = '<p>No events available.</p>';
+        return;
+    }
+
+    const event = events[0];
+    const response = await fetch(`/api/events/${event.id}/recommendations`);
+    const recommendations = await response.json();
+
+    const html = recommendations.map(item => `
+        <div class="recommendation-item">
+            <span class="badge bg-${item.priority === 'High' ? 'danger' : item.priority === 'Medium' ? 'warning' : 'secondary'}">${item.priority}</span>
+            <p>${item.text}</p>
+        </div>
+    `).join('');
+
+    document.getElementById('recommendations-container').innerHTML = html || '<p>No recommendations available.</p>';
+}
+
+loadRecommendations();
+</script>
+{% endblock %}

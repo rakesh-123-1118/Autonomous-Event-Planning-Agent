@@ -1,0 +1,88 @@
+{% extends 'base.html' %}
+
+{% block title %}Dashboard{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="page-header mb-4">
+        <h2>Event Dashboard</h2>
+        <p class="text-muted">Track progress, completion, and upcoming deadlines.</p>
+    </div>
+
+    <div id="dashboard-summary" class="row g-3 mb-4"></div>
+    <div class="row g-4">
+        <div class="col-lg-6"><canvas id="progressChart"></canvas></div>
+        <div class="col-lg-6"><canvas id="categoryChart"></canvas></div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+async function loadDashboard() {
+    const eventsResponse = await fetch('/api/events');
+    const events = await eventsResponse.json();
+    if (!events.length) {
+        document.getElementById('dashboard-summary').innerHTML = '<p>No events available.</p>';
+        return;
+    }
+
+    const event = events[0];
+    const response = await fetch(`/api/events/${event.id}/dashboard`);
+    const data = await response.json();
+
+    const summary = document.getElementById('dashboard-summary');
+    summary.innerHTML = `
+        <div class="col-md-3"><div class="stat-card"><h6>Total Events</h6><h3>1</h3></div></div>
+        <div class="col-md-3"><div class="stat-card"><h6>Total Tasks</h6><h3>${data.total_tasks || 0}</h3></div></div>
+        <div class="col-md-3"><div class="stat-card"><h6>Completed</h6><h3>${data.completed_tasks || 0}</h3></div></div>
+        <div class="col-md-3"><div class="stat-card"><h6>Pending</h6><h3>${data.pending_tasks || 0}</h3></div></div>
+    `;
+
+    new Chart(document.getElementById('progressChart'), {
+        type: 'doughnut',
+        data: {
+            labels: ['Completed', 'Pending', 'Overdue'],
+            datasets: [{
+                data: [data.completed_tasks || 0, data.pending_tasks || 0, data.overdue_tasks || 0],
+                backgroundColor: ['#10b981', '#4f46e5', '#f44336']
+            }]
+        },
+        options: {
+            plugins: {
+                legend: {
+                    position: 'bottom'
+                }
+            }
+        }
+    });
+
+    const categoryLabels = (data.task_distribution || []).map(item => item.label);
+    const categoryValues = (data.task_distribution || []).map(item => item.value);
+
+    new Chart(document.getElementById('categoryChart'), {
+        type: 'bar',
+        data: {
+            labels: categoryLabels,
+            datasets: [{
+                label: 'Tasks by Category',
+                data: categoryValues,
+                backgroundColor: '#6366f1'
+            }]
+        },
+        options: {
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        precision: 0
+                    }
+                }
+            }
+        }
+    });
+}
+
+loadDashboard();
+</script>
+{% endblock %}

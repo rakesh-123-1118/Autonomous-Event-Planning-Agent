@@ -1,0 +1,39 @@
+<svg width="900" height="260" viewBox="0 0 900 260" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="gold" x1="0" y1="0" x2="900" y2="260" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#FFF2C2"/>
+      <stop offset="0.15" stop-color="#F7DD8A"/>
+      <stop offset="0.35" stop-color="#D9A63A"/>
+      <stop offset="0.55" stop-color="#F0C75C"/>
+      <stop offset="0.8" stop-color="#B87C19"/>
+      <stop offset="1" stop-color="#F8E3A5"/>
+    </linearGradient>
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="6" stdDeviation="8" flood-color="#000" flood-opacity="0.25"/>
+    </filter>
+  </defs>
+
+  <rect width="900" height="260" rx="24" fill="#050505"/>
+
+  <g filter="url(#shadow)">
+    <rect x="24" y="26" width="210" height="208" rx="22" fill="#050505" stroke="url(#gold)" stroke-width="6"/>
+
+    <g transform="translate(58 42)">
+      <path d="M20 16V108H118V16H20Z" fill="url(#gold)"/>
+      <path d="M38 40H100" stroke="#090909" stroke-width="8" stroke-linecap="round"/>
+      <path d="M38 60H100" stroke="#090909" stroke-width="8" stroke-linecap="round"/>
+      <path d="M38 80H100" stroke="#090909" stroke-width="8" stroke-linecap="round"/>
+      <path d="M34 94L60 70L76 84L102 57" stroke="#090909" stroke-width="9" stroke-linecap="round" stroke-linejoin="round"/>
+      <path d="M52 27L72 14L91 27" stroke="#090909" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/>
+      <path d="M71 14V27" stroke="#090909" stroke-width="8" stroke-linecap="round"/>
+    </g>
+
+    <path d="M252 160C288 105 354 68 431 68" stroke="url(#gold)" stroke-width="7" stroke-linecap="round"/>
+    <path d="M246 167C319 101 392 96 470 156" stroke="url(#gold)" stroke-width="7" stroke-linecap="round"/>
+    <path d="M421 68V160" stroke="url(#gold)" stroke-width="7" stroke-linecap="round"/>
+
+    <g transform="translate(286 12)">
+      <text x="0" y="154" font-family="Georgia, 'Times New Roman', serif" font-size="144" font-weight="700" letter-spacing="-7" fill="url(#gold)">ROCKY</text>
+    </g>
+  </g>
+</svg>

@@ -1,0 +1,78 @@
+{% extends 'base.html' %}
+
+{% block title %}AI Planning{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="page-header mb-4">
+        <h2>AI Planning View</h2>
+        <p class="text-muted">Review the analyzed event and generated tasks before saving the plan.</p>
+    </div>
+
+    <div id="planning-container" class="card custom-card p-4">
+        <p>Loading planning details...</p>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+async function loadLatestEvent() {
+    const params = new URLSearchParams(window.location.search);
+    const eventId = params.get('event_id');
+
+    let event = null;
+    if (eventId) {
+        const singleResponse = await fetch(`/api/events/${eventId}`);
+        event = await singleResponse.json();
+    } else {
+        const response = await fetch('/api/events');
+        const events = await response.json();
+        if (!events.length) {
+            document.getElementById('planning-container').innerHTML = '<p>No events found. Create one first.</p>';
+            return;
+        }
+        event = events[0];
+    }
+
+    let tasks = [];
+    if (event && event.id) {
+        const taskResponse = await fetch(`/api/events/${event.id}/tasks`);
+        tasks = await taskResponse.json();
+    }
+
+    const html = `
+        <h4>${event.event_name}</h4>
+        <p><strong>Type:</strong> ${event.event_type}</p>
+        <p><strong>Location:</strong> ${event.location || 'Not specified'}</p>
+        <p><strong>Participants:</strong> ${event.participants || 0}</p>
+        <p><strong>Budget:</strong> ₹${event.budget || 0}</p>
+        <p><strong>Description:</strong> ${event.description || 'No description provided'}</p>
+        <hr>
+        <h5>Generated Tasks</h5>
+        <div class="table-responsive">
+            <table class="table table-striped">
+                <thead>
+                    <tr><th>Title</th><th>Category</th><th>Priority</th><th>Status</th><th>Deadline</th></tr>
+                </thead>
+                <tbody>
+                    ${tasks.length ? tasks.map(task => `
+                        <tr>
+                            <td>${task.title}</td>
+                            <td>${task.category}</td>
+                            <td>${task.priority}</td>
+                            <td><span class="badge bg-light text-dark">${task.status}</span></td>
+                            <td>${task.deadline || 'Not set'}</td>
+                        </tr>
+                    `).join('') : '<tr><td colspan="5">No tasks generated yet.</td></tr>'}
+                </tbody>
+            </table>
+        </div>
+    `;
+
+    document.getElementById('planning-container').innerHTML = html;
+}
+
+loadLatestEvent();
+</script>
+{% endblock %}

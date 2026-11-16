@@ -1,0 +1,101 @@
+{% extends 'base.html' %}
+
+{% block title %}Task Management{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="page-header mb-4">
+        <h2>Task Management</h2>
+        <p class="text-muted">Update status, edit tasks, and manage dependencies.</p>
+    </div>
+
+    <div id="tasks-container" class="card custom-card p-4">
+        Loading tasks...
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+async function loadTasks() {
+    const eventsResponse = await fetch('/api/events');
+    const events = await eventsResponse.json();
+    if (!events.length) {
+        document.getElementById('tasks-container').innerHTML = '<p>No events available.</p>';
+        return;
+    }
+
+    const event = events[0];
+    const response = await fetch(`/api/events/${event.id}/tasks`);
+    const tasks = await response.json();
+
+    if (!tasks.length) {
+        document.getElementById('tasks-container').innerHTML = '<p>No task data for this event yet.</p>';
+        return;
+    }
+
+    const html = `
+        <div class="table-responsive">
+            <table class="table table-striped align-middle">
+                <thead>
+                    <tr>
+                        <th>Title</th>
+                        <th>Category</th>
+                        <th>Priority</th>
+                        <th>Status</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    ${tasks.map(task => `
+                        <tr>
+                            <td>${task.title}</td>
+                            <td>${task.category}</td>
+                            <td>${task.priority}</td>
+                            <td>
+                                <select class="form-select form-select-sm status-select" data-task-id="${task.id}">
+                                    <option ${task.status === 'Pending' ? 'selected' : ''}>Pending</option>
+                                    <option ${task.status === 'In Progress' ? 'selected' : ''}>In Progress</option>
+                                    <option ${task.status === 'Completed' ? 'selected' : ''}>Completed</option>
+                                    <option ${task.status === 'Blocked' ? 'selected' : ''}>Blocked</option>
+                                </select>
+                            </td>
+                            <td>
+                                <button class="btn btn-sm btn-outline-primary update-status-btn" data-task-id="${task.id}">Update</button>
+                            </td>
+                        </tr>
+                    `).join('')}
+                </tbody>
+            </table>
+        </div>
+    `;
+
+    document.getElementById('tasks-container').innerHTML = html;
+
+    document.querySelectorAll('.update-status-btn').forEach(button => {
+        button.addEventListener('click', async function () {
+            const taskId = this.dataset.taskId;
+            const select = document.querySelector(`.status-select[data-task-id="${taskId}"]`);
+            const status = select.value;
+
+            const response = await fetch(`/api/tasks/${taskId}/status`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ status })
+            });
+
+            const result = await response.json();
+            if (!response.ok) {
+                alert(result.error || 'Could not update task.');
+                return;
+            }
+
+            alert('Task status updated successfully.');
+            loadTasks();
+        });
+    });
+}
+
+loadTasks();
+</script>
+{% endblock %}
